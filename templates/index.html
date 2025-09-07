@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Image Caption Generator</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        html, body {
+            height: 100%;
+            margin: 0; padding: 0;
+            background: #f8fafd;
+            position: relative;
+            min-height: 100vh;
+        }
+        /* More colorful, visible background elements */
+        .bg-shape {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(0px);
+            opacity: 0.53;
+            z-index: 0;
+        }
+        .bg1 { background: #7dd3fc; width: 320px; height: 320px; left: -110px; top: -62px; }
+        .bg2 { background: #fff89b; width: 200px; height: 200px; right: 10px; top: 10vh;}
+        .bg3 { background: #ffa87b; width: 220px; height: 220px; left: 54vw; top: 65vh;}
+        .bg4 { background: #c0caff; width: 220px; height: 220px; right: 7vw; bottom: 6vw;}
+        .bg5 { background: #baf7d4; width: 140px; height: 140px; left: 9vw; bottom: 7vw;}
+        .bg6 { background: #ffb5ef; width: 190px; height: 190px; left: 70vw; top: 33vh;}
+        .bg7 { background: #e2aaff; width: 120px; height: 120px; right: 23vw; bottom: 20vh;}
+        .bg8 { background: #ffecd1; width: 90px; height: 90px; left: 24vw; top: 64vh;}
+        body {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        .caption-box {
+            position: relative;
+            background: #fff;
+            border-radius: 18px;
+            box-shadow: 0 6px 32px rgba(44,51,56,0.13), 0 1.5px 0 #e4eafe;
+            padding: 36px 38px 24px 38px;
+            margin: 45px 0 0 0;
+            max-width: 430px;
+            width: 97vw;
+            min-width: 287px;
+            text-align: center;
+            z-index: 10;
+            left: 0; right: 0;
+        }
+        h1 {
+            margin: 0 0 10px 0;
+            font-size: 2.12rem;
+            font-weight: 800;
+            color: #1757b4;
+            letter-spacing: 1px;
+        }
+        form {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-bottom: 0;
+        }
+        label {
+            color: #365093;
+            font-size: 1.06rem;
+            font-weight: 500;
+            margin-bottom: 11px;
+        }
+        input[type="file"] {
+            width: 100%;
+            margin-bottom: 20px;
+            padding: 10px;
+            border-radius: 8px;
+            border: 1.3px solid #7dbcf3;
+            background: #f2f7fc;
+            color: #223b4d;
+            font-size: 1rem;
+        }
+        button {
+            width: 100%;
+            padding: 13px 0;
+            font-size: 1.12rem;
+            color: #fff;
+            background: #1a5ecb;
+            font-weight: 600;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            box-shadow: 0 2px 9px rgba(33,55,88,0.13);
+            transition: background 0.20s, color 0.20s;
+            letter-spacing: 0.55px;
+        }
+        button:hover {
+            background: #ffd600;
+            color: #222;
+        }
+        .generated-output h3 {
+            margin-top: 20px;
+            color: #28304d;
+            font-size: 1.09rem;
+            font-weight: 600;
+        }
+        .generated-output p {
+            margin: 10px 0 0 0;
+            color: #32426d;
+            font-size: 1.01rem;
+        }
+        img {
+            display: block;
+            margin: 14px auto 0 auto;
+            max-width: 97%;
+            border-radius: 11px;
+            border: 1.5px solid #ffc60031;
+        }
+        /* Long description styling below box */
+        /* .description-section {
+            margin: 42px auto 0 auto;
+            max-width: 680px;
+            background: #fafffc;
+            border-radius: 19px;
+            box-shadow: 0 2px 16px rgba(33,55,88,0.08);
+            padding: 35px 33px 26px 33px;
+            color: #2c395a;
+            font-size: 1.16rem;
+            z-index: 3;
+            position: relative;
+        } */
+
+        .description-section {
+            /* margin: 100vh 0 0 0;
+            min-height: 100vh; */
+            margin: 60px auto 40px auto;
+            min-height: auto;
+            max-width: 100%;
+            background: #fafffc00;
+            padding: 80px 5% 60px 5%;
+            color: #2c395a;
+            font-size: 1.16rem;
+            z-index: 3;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .description-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 60px;
+            max-width: 1200px;
+            align-items: start;
+        }
+
+        .description-left, .description-right {
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 8px 24px rgba(33,55,88,0.12);
+        }
+
+        .description-section strong {
+            color: #1757b4;
+            font-weight: bold;
+            font-size: 1.13rem;
+        }
+        .description-section ul {
+            margin-top: 9px;
+            margin-bottom: 11px;
+            padding-left: 20px;
+        }
+        /* AI-illustrations fade for subtle background */
+        .ai-bg {
+            pointer-events: none;
+        }
+
+        .loading {
+            display: none;
+            margin-top: 15px;
+            color: #1757b4;
+            font-weight: 500;
+        }
+
+        .spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #1757b4;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-right: 10px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        @media (max-width: 700px) {
+            .caption-box { max-width: 98vw; min-width: unset; padding: 8vw 3.7vw 7vw 3.7vw;}
+            .description-section { max-width: 99vw; padding: 8vw 4vw 7vw 4vw; font-size: 1.04rem;}
+        }
+
+        @media (max-width: 768px) {
+            .description-content {
+                grid-template-columns: 1fr;
+                gap: 30px;
+            }
+            .description-left, .description-right {
+                padding: 25px;
+            }
+        }
+
+    </style>
+</head>
+<body>
+    <!-- Colorful background blobs -->
+    <div class="bg-shape bg1"></div>
+    <div class="bg-shape bg2"></div>
+    <div class="bg-shape bg3"></div>
+    <div class="bg-shape bg4"></div>
+    <div class="bg-shape bg5"></div>
+    <div class="bg-shape bg6"></div>
+    <div class="bg-shape bg7"></div>
+    <div class="bg-shape bg8"></div>
+    <!-- Decorative AI-themed illustrations (replace the 'src' attributes with your relevant image paths) -->
+    <img src="ai-chip.png" alt="" class="ai-bg" style="position:absolute; top:65px; left:18vw; width:68px; opacity:0.34; z-index:0;" />
+    <img src="neural-circuit.svg" alt="" class="ai-bg" style="position:absolute; top:33vh; left:4vw; width:120px; opacity:0.20; z-index:0;" />
+    <img src="robot-head.png" alt="" class="ai-bg" style="position:absolute; right:9vw; top:50vh; width:74px; opacity:0.28; z-index:0;" />
+    <img src="brain-network.svg" alt="" class="ai-bg" style="position:absolute; bottom:16vw; left:57vw; width:80px; opacity:0.23; z-index:0;" />
+
+    <div class="caption-box">
+        <h1>🖼️ Image Caption Generator</h1>
+        <!-- <form action="/generate_caption" method="POST" enctype="multipart/form-data"> -->
+        <!-- <form action="/" method="POST" enctype="multipart/form-data"></form>
+            <label for="image">Select an image to generate a caption:</label>
+            <input type="file" id="image" name="image" accept="image/*" required>
+            <button type="submit">Generate Caption</button>
+        </form> -->
+        <form action="/" method="POST" enctype="multipart/form-data">
+            <label for="image">Select an image to generate a caption:</label>
+            <input type="file" id="image" name="image" accept="image/*" required>
+            <button type="submit">Generate Caption</button>
+            <div class="loading">
+                <div class="spinner"></div>Generating caption...
+            </div>
+        </form>
+        <!-- For Flask/Jinja:
+        {% if caption %}
+        <div class="generated-output">
+            <h3>Generated Caption:</h3>
+            <p>{{ caption }}</p>
+            <img src="{{ url_for('static', filename='uploaded_image.jpg') }}" alt="Uploaded Image">
+        </div>
+        {% endif %} -->
+        {% if caption %}
+        <div class="generated-output">
+            <h3>Generated Caption:</h3>
+            <p>{{ caption }}</p>
+            <img src="{{ url_for('display_image', filename=filename) }}" alt="Uploaded Image">
+        </div>
+        {% endif %}
+        <!-- For static fallback/demo:
+        <div class="generated-output">
+            <h3>Generated Caption:</h3>
+            <p>A group of friends enjoying a picnic under a blue sky.</p>
+            <img src="demo.jpg" alt="Uploaded Image">
+        </div> -->
+    </div>
+    <!-- <div class="description-section">
+        <strong>About Image Captioning</strong><br><br>
+        <b>Image captioning</b> is an advanced field at the intersection of computer vision and natural language processing. It refers to the automated process of analyzing an image and generating a natural, human-like description of its content. The goal is to teach computers not just to recognize objects, but to understand the relationships and context in an image as a whole.
+        <br><br>
+        <strong>How Does Image Captioning Work?</strong>
+        <ul>
+            <li>AI models first "see" and detect the key elements in an image using deep learning techniques (often convolutional neural networks for vision).</li>
+            <li>NLP algorithms then compose a clear, grammatically correct sentence describing what’s happening in the image (using recurrent or transformer-based neural networks).</li>
+        </ul>
+        <strong>Key Applications & Uses</strong>
+        <ul>
+            <li><b>Accessibility for the visually impaired</b>: Automatically reading out or describing images on websites, applications, and documents.</li>
+            <li><b>Smart photo management</b>: Enabling search, sorting, and organizing photos by content.</li>
+            <li><b>Social media & creative tools</b>: Auto-captioning posts and suggesting hashtags or alt text.</li>
+            <li><b>Content moderation and analytics</b>: Understanding and flagging inappropriate or sensitive images.</li>
+            <li><b>Education & training</b>: Helping language learners and children connect words and visual concepts.</li>
+        </ul>
+        <strong>Why is it Important?</strong>
+        <br>
+        Automated image captioning helps break down barriers to content, supports inclusivity, and opens exciting possibilities in creative and technical domains. As AI technology advances, the quality, detail, and usefulness of image captions continue to grow.
+        <br><br>
+        <i>Try uploading an image above to explore how AI “sees” the world and describes it back to you!</i>
+    </div> -->
+
+    <div class="description-section">
+        <div class="description-content">
+            <div class="description-left">
+                <strong>About Image Captioning</strong><br><br>
+                <b>Image captioning</b> is an advanced field at the intersection of computer vision and natural language processing. It refers to the automated process of analyzing an image and generating a natural, human-like description of its content.
+                <br><br>
+                <strong>How Does Image Captioning Work?</strong>
+                <ul>
+                    <li>AI models first "see" and detect the key elements in an image using deep learning techniques.</li>
+                    <li>NLP algorithms then compose a clear, grammatically correct sentence describing what's happening.</li>
+                </ul>
+            </div>
+            <div class="description-right">
+                <strong>Key Applications & Uses</strong>
+                <ul>
+                    <li><b>Accessibility for the visually impaired</b>: Automatically reading out images on websites and applications.</li>
+                    <li><b>Smart photo management</b>: Enabling search, sorting, and organizing photos by content.</li>
+                    <li><b>Social media & creative tools</b>: Auto-captioning posts and suggesting hashtags.</li>
+                    <li><b>Content moderation</b>: Understanding and flagging inappropriate images.</li>
+                    <li><b>Education & training</b>: Helping connect words and visual concepts.</li>
+                </ul>
+                <br>
+                <strong>Why is it Important?</strong><br>
+                Automated image captioning helps break down barriers to content, supports inclusivity, and opens exciting possibilities in creative and technical domains.
+                <br><br>
+                <i>Try uploading an image above to explore how AI describes it!</i>
+            </div>
+        </div>
+    </div>
+
+</body>
+<script>
+document.querySelector('form').addEventListener('submit', function() {
+    const button = document.querySelector('button[type="submit"]');
+    const loading = document.createElement('div');
+    loading.className = 'loading';
+    loading.style.display = 'block';
+    loading.innerHTML = '<div class="spinner"></div>Generating caption...';
+    
+    button.disabled = true;
+    button.textContent = 'Processing...';
+    button.style.background = '#ccc';
+    
+    this.appendChild(loading);
+});
+</script>
+</html>
